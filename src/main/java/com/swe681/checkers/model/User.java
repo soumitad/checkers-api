@@ -1,4 +1,4 @@
-package com.soumita.checkersapi.model;
+package com.swe681.checkers.model;
 
 //this is  my user object that will hold data
 public class User {

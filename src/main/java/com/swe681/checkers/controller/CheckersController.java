@@ -1,8 +1,8 @@
-package com.soumita.checkersapi.controller;
+package com.swe681.checkers.controller;
 
-import com.soumita.checkersapi.model.User;
-import com.soumita.checkersapi.model.game.checkers.Space;
-import com.soumita.checkersapi.service.CheckerService;
+import com.swe681.checkers.model.game.checkers.GameInfo;
+import com.swe681.checkers.model.game.checkers.Space;
+import com.swe681.checkers.service.CheckerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +17,8 @@ public class CheckersController {
     private CheckerService checkerService;
 
     @RequestMapping(value = "/game", method = RequestMethod.GET)
-    public ResponseEntity<Space[][]> getUserInfo() {
-        Space[][] board = checkerService.createNewGame();
-        return new ResponseEntity<>(board, HttpStatus.OK);
+    public ResponseEntity<GameInfo> createNewGame() {
+        GameInfo gameplay = checkerService.createNewGame();
+        return new ResponseEntity<>(gameplay, HttpStatus.OK);
     }
 }

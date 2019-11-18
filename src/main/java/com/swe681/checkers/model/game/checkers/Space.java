@@ -1,4 +1,4 @@
-package com.soumita.checkersapi.model.game.checkers;
+package com.swe681.checkers.model.game.checkers;
 
 public class Space {
     private String name;

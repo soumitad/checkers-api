@@ -1,8 +1,8 @@
-package com.soumita.checkersapi.service;
+package com.swe681.checkers.service;
 
 
-import com.soumita.checkersapi.model.User;
-import com.soumita.checkersapi.repository.UserRepository;
+import com.swe681.checkers.model.User;
+import com.swe681.checkers.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

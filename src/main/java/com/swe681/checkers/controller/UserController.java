@@ -1,7 +1,7 @@
-package com.soumita.checkersapi.controller;
+package com.swe681.checkers.controller;
 
-import com.soumita.checkersapi.model.User;
-import com.soumita.checkersapi.service.UserService;
+import com.swe681.checkers.model.User;
+import com.swe681.checkers.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

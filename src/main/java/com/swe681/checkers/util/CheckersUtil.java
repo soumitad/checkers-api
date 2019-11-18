@@ -1,13 +1,11 @@
-package com.soumita.checkersapi.service;
+package com.swe681.checkers.util;
 
-import com.soumita.checkersapi.model.game.checkers.Piece;
-import com.soumita.checkersapi.model.game.checkers.Space;
-import org.springframework.stereotype.Service;
+import com.swe681.checkers.model.game.checkers.Piece;
+import com.swe681.checkers.model.game.checkers.Space;
 
-@Service
-public class CheckerServiceImpl implements CheckerService{
-    @Override
-    public Space[][] createNewGame() {
+public class CheckersUtil {
+
+    public static Space[][] initializeGameBoard() {
         Space[][] checkersBoard = new Space[8][8];
         int pieceCounter = 1;
         //Create top 3 rows for Red pieces on the board
@@ -94,7 +92,7 @@ public class CheckerServiceImpl implements CheckerService{
         return checkersBoard;
     }
 
-    private void setPieceInSpace(Space space, int col, int row, boolean playable, Piece piece) {
+    private static void setPieceInSpace(Space space, int col, int row, boolean playable, Piece piece) {
         space.setCol(col);
         space.setRow(row);
         space.setPlayable(playable);
