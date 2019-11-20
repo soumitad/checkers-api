@@ -8,6 +8,9 @@ import com.swe681.checkers.util.CheckersUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class CheckerServiceImpl implements CheckerService{
 
@@ -32,8 +35,17 @@ public class CheckerServiceImpl implements CheckerService{
     }
 
     @Override
-    public String[] fetchLegalMoves(String gameId, String color, String currentPosition, String pieceId) {
-        String[] positionArray = currentPosition.split("-");
+    public String[] fetchLegalMoves(GamePlayRequest gamePlayRequest) {
+        String[] allowedLegalMove = new String[2];
+        Map<Integer, Integer> allowedRowMovement;
+        Map<Integer, List<Integer>> allowedColMovement = util.allowedColMovementForPieces();
+        int row = 0;
+        String[] positionArray = gamePlayRequest.getCurrentPosition().split("-");
+        if (gamePlayRequest.getColor().equalsIgnoreCase("Red")) {
+            allowedRowMovement = util.getRowMovementForWhitePawn();
+            row = allowedRowMovement.get(positionArray[0]);
+            List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
+        }
 
         return new String[0];
     }

@@ -2,6 +2,7 @@ package com.swe681.checkers.dao;
 
 import com.swe681.checkers.model.game.checkers.GameInfo;
 import com.swe681.checkers.model.game.checkers.Piece;
+import com.swe681.checkers.model.request.GamePlayRequest;
 import com.swe681.checkers.model.request.GameRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -40,6 +41,12 @@ public class GameDaoImpl implements GameDao{
                 gameId, piece.getColor(), piece.getPieceName(),
                 row, col, piece.getType(), playerId);
         return status;
+    }
+
+    @Override
+    public Piece fetchPieceByPosition(GamePlayRequest gamePlayRequest, int row, int col) {
+        String sql = "select color, pieceId, type from sdas22.gameplay where rowNum=? and colNum=? and gameId=?";
+        return null;
     }
 
     private Integer fetchLastGameId() {

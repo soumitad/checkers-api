@@ -8,6 +8,6 @@ import com.swe681.checkers.model.request.GameRequest;
 public interface CheckerService {
 
     public GameInfo createNewGame(GameRequest gameRequest);
-    public String[] fetchLegalMoves(String gameId, String color, String currentPosition, String pieceId);
+    public String[] fetchLegalMoves(GamePlayRequest gamePlayRequest);
     public boolean performMove(GamePlayRequest gamePlayRequest);
 }
