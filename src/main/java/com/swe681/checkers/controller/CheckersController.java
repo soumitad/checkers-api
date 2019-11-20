@@ -27,4 +27,14 @@ public class CheckersController {
         }
 
     }
+
+    @RequestMapping(value = "/{gameId}/moves")
+    public ResponseEntity<String[]> fetchLegalMoves(@PathVariable("gameId") String gameId,
+                                            @RequestParam("color") String color,
+                                            @RequestParam("pieceId") String pieceId,
+                                            @RequestParam("currentPosition") String currentPosition) {
+
+        return null;
+
+    }
 }

@@ -1,6 +1,7 @@
 package com.swe681.checkers.dao;
 
 import com.swe681.checkers.model.game.checkers.GameInfo;
+import com.swe681.checkers.model.game.checkers.Piece;
 import com.swe681.checkers.model.request.GameRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,6 +31,15 @@ public class GameDaoImpl implements GameDao{
             return 0;
         }
 
+    }
+
+    @Override
+    public int insertPieceInfo(Piece piece, int row, int col, String playerId, int gameId) {
+        int status = jdbcTemplate.update(
+                "INSERT INTO sdas22.gameplay VALUES (?, ?, ?, ?, ?, ?, ?)",
+                gameId, piece.getColor(), piece.getPieceName(),
+                row, col, piece.getType(), playerId);
+        return status;
     }
 
     private Integer fetchLastGameId() {
