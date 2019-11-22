@@ -158,7 +158,7 @@ public class CheckersUtil {
         return columnMovementMap;
     }
 
-    public Map<Integer, Integer> getRowMovementForWhitePawn() {
+    public Map<Integer, Integer> getRowMovementForRedPawn() {
         Map<Integer, Integer> whitePawnMap = new HashMap<>();
         whitePawnMap.put(6, 7);
         whitePawnMap.put(5, 6);

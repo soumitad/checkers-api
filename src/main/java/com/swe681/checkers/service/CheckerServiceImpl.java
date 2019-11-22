@@ -45,7 +45,7 @@ public class CheckerServiceImpl implements CheckerService{
         String[] positionArray = gamePlayRequest.getCurrentPosition().split("-");
         int legalMovesCounter = 0;
         if (gamePlayRequest.getColor().equalsIgnoreCase("Red")) {
-            allowedRowMovement = util.getRowMovementForWhitePawn();
+            allowedRowMovement = util.getRowMovementForRedPawn();
             row = allowedRowMovement.get(positionArray[0]);
             List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
             //Iterate the Column list and combine with row to check if any piece exists
@@ -66,7 +66,6 @@ public class CheckerServiceImpl implements CheckerService{
                             allowedLegalMove.add((row + 1) + "-" + (col -1 ));
                         }
                     }
-
                 }
             }
 
@@ -93,12 +92,15 @@ public class CheckerServiceImpl implements CheckerService{
                             allowedLegalMove.add((row - 1) + "-" + (col -1 ));
                         }
                     }
-
                 }
             }
         }
 
         return allowedLegalMove;
+    }
+
+    private void fetchAdditionalLegalMoveKing(GamePlayRequest gamePlayRequest) {
+
     }
 
     private boolean isJumpPossible(GamePlayRequest gamePlayRequest, int row, int col) {
