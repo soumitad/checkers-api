@@ -2,6 +2,7 @@ package com.swe681.checkers.service;
 
 import com.swe681.checkers.dao.GameDao;
 import com.swe681.checkers.model.game.checkers.GameInfo;
+import com.swe681.checkers.model.game.checkers.Piece;
 import com.swe681.checkers.model.request.GamePlayRequest;
 import com.swe681.checkers.model.request.GameRequest;
 import com.swe681.checkers.util.CheckersUtil;
@@ -41,20 +42,50 @@ public class CheckerServiceImpl implements CheckerService{
         Map<Integer, List<Integer>> allowedColMovement = util.allowedColMovementForPieces();
         int row = 0;
         String[] positionArray = gamePlayRequest.getCurrentPosition().split("-");
+        int legalMovesCounter = 0;
         if (gamePlayRequest.getColor().equalsIgnoreCase("Red")) {
             allowedRowMovement = util.getRowMovementForWhitePawn();
             row = allowedRowMovement.get(positionArray[0]);
             List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
-
             //Iterate the Column list and combine with row to check if any piece exists
             for (Integer col: allowedColsList) {
                 //Check if row - col combo already has a piece and the color of piece to
-                //determine if jump is possible
+                Piece piece = gameDao.fetchPieceByPosition(gamePlayRequest, row, col);
+                if (piece == null) {
+                    allowedLegalMove[legalMovesCounter++] = row + "-" + col;
+                } else if (piece != null && piece.getColor().equalsIgnoreCase("Black")) {
+                    if (col == Integer.parseInt(positionArray[1]) + 1 && (col + 1) <= 7) {
+                        if(isJumpPossible(gamePlayRequest, row + 1, col + 1)) {
+                            //Add the row - col combo to the legal moves array
+                            allowedLegalMove[legalMovesCounter++] = (row + 1) + "-" + (col + 1);
+                        }
+                    } else if (col == Integer.parseInt(positionArray[1]) - 1 && (col - 1) >= 0) {
+                        if(isJumpPossible(gamePlayRequest, row + 1, col - 1)) {
+                            //Add the row - col combo to the legal moves array
+                            allowedLegalMove[legalMovesCounter++] = (row + 1) + "-" + (col -1 );
+                        }
+                    }
+
+                }
             }
 
+        } else {
+            //Fetch legal moves for Black piece
         }
 
         return new String[0];
+    }
+
+    private boolean isJumpPossible(GamePlayRequest gamePlayRequest, int row, int col) {
+        // Need to determine if Jump is possible
+        Piece blockerPiece = gameDao.fetchPieceByPosition(gamePlayRequest, row + 1, col + 1);
+        if (blockerPiece == null) {
+                // jump possible
+            return true;
+        } else {
+                // jump not possible
+            return false;
+        }
     }
 
     @Override
@@ -72,7 +103,7 @@ public class CheckerServiceImpl implements CheckerService{
      * @return
      */
     private boolean isWinner(String color) {
-        //Fetch list of remaining White pieces and their current position
+        //Fetch list of remaining color pieces and their current position
         //For each piece, call legalMoves to check if one exists,
         //If even one legal move exists, the color is not winner, use break statement
 
