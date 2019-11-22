@@ -9,6 +9,7 @@ import com.swe681.checkers.util.CheckersUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,8 +37,8 @@ public class CheckerServiceImpl implements CheckerService{
     }
 
     @Override
-    public String[] fetchLegalMoves(GamePlayRequest gamePlayRequest) {
-        String[] allowedLegalMove = new String[2];
+    public List<String> fetchLegalMoves(GamePlayRequest gamePlayRequest) {
+        List<String> allowedLegalMove = new ArrayList<>();
         Map<Integer, Integer> allowedRowMovement;
         Map<Integer, List<Integer>> allowedColMovement = util.allowedColMovementForPieces();
         int row = 0;
@@ -52,17 +53,17 @@ public class CheckerServiceImpl implements CheckerService{
                 //Check if row - col combo already has a piece and the color of piece to
                 Piece piece = gameDao.fetchPieceByPosition(gamePlayRequest, row, col);
                 if (piece == null) {
-                    allowedLegalMove[legalMovesCounter++] = row + "-" + col;
+                    allowedLegalMove.add(row + "-" + col) ;
                 } else if (piece != null && piece.getColor().equalsIgnoreCase("Black")) {
                     if (col == Integer.parseInt(positionArray[1]) + 1 && (col + 1) <= 7) {
                         if(isJumpPossible(gamePlayRequest, row + 1, col + 1)) {
                             //Add the row - col combo to the legal moves array
-                            allowedLegalMove[legalMovesCounter++] = (row + 1) + "-" + (col + 1);
+                            allowedLegalMove.add((row + 1) + "-" + (col + 1));
                         }
                     } else if (col == Integer.parseInt(positionArray[1]) - 1 && (col - 1) >= 0) {
                         if(isJumpPossible(gamePlayRequest, row + 1, col - 1)) {
                             //Add the row - col combo to the legal moves array
-                            allowedLegalMove[legalMovesCounter++] = (row + 1) + "-" + (col -1 );
+                            allowedLegalMove.add((row + 1) + "-" + (col -1 ));
                         }
                     }
 
@@ -71,9 +72,33 @@ public class CheckerServiceImpl implements CheckerService{
 
         } else {
             //Fetch legal moves for Black piece
+            allowedRowMovement = util.getRowMovementForBlackPawn();
+            row = allowedRowMovement.get(positionArray[0]);
+            List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
+            //Iterate the Column list and combine with row to check if any piece exists
+            for (Integer col: allowedColsList) {
+                //Check if row - col combo already has a piece and the color of piece to
+                Piece piece = gameDao.fetchPieceByPosition(gamePlayRequest, row, col);
+                if (piece == null) {
+                    allowedLegalMove.add(row + "-" + col) ;
+                } else if (piece != null && piece.getColor().equalsIgnoreCase("Red")) {
+                    if (col == Integer.parseInt(positionArray[1]) + 1 && (col + 1) <= 7) {
+                        if(isJumpPossible(gamePlayRequest, row -1 , col + 1)) {
+                            //Add the row - col combo to the legal moves array
+                            allowedLegalMove.add((row - 1) + "-" + (col + 1));
+                        }
+                    } else if (col == Integer.parseInt(positionArray[1]) - 1 && (col - 1) >= 0) {
+                        if(isJumpPossible(gamePlayRequest, row + 1, col - 1)) {
+                            //Add the row - col combo to the legal moves array
+                            allowedLegalMove.add((row - 1) + "-" + (col -1 ));
+                        }
+                    }
+
+                }
+            }
         }
 
-        return new String[0];
+        return allowedLegalMove;
     }
 
     private boolean isJumpPossible(GamePlayRequest gamePlayRequest, int row, int col) {
@@ -109,6 +134,9 @@ public class CheckerServiceImpl implements CheckerService{
 
         return false;
     }
+
+    //Audit trail of the Checkers Game
+    //GameId - Color - Piece Id - MoveFrom - MoveTo
 
 
 }
