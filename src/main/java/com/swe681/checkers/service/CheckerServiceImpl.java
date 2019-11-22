@@ -45,6 +45,13 @@ public class CheckerServiceImpl implements CheckerService{
             allowedRowMovement = util.getRowMovementForWhitePawn();
             row = allowedRowMovement.get(positionArray[0]);
             List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
+
+            //Iterate the Column list and combine with row to check if any piece exists
+            for (Integer col: allowedColsList) {
+                //Check if row - col combo already has a piece and the color of piece to
+                //determine if jump is possible
+            }
+
         }
 
         return new String[0];

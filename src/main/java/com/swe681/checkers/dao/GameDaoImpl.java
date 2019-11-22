@@ -7,7 +7,11 @@ import com.swe681.checkers.model.request.GameRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static java.time.LocalTime.now;
 
@@ -46,7 +50,14 @@ public class GameDaoImpl implements GameDao{
     @Override
     public Piece fetchPieceByPosition(GamePlayRequest gamePlayRequest, int row, int col) {
         String sql = "select color, pieceId, type from sdas22.gameplay where rowNum=? and colNum=? and gameId=?";
-        return null;
+        Piece piece;
+        try{
+            piece = jdbcTemplate.queryForObject(sql,
+                    new Object[] { row, col, gamePlayRequest.getGameId() }, new PieceRowMapper());
+        } catch (EmptyResultDataAccessException emptyException) {
+            piece = null;
+        }
+        return piece;
     }
 
     private Integer fetchLastGameId() {
@@ -57,8 +68,19 @@ public class GameDaoImpl implements GameDao{
                     sql, new Object[]{}, Integer.class);
         } catch (EmptyResultDataAccessException emptyException) {
             System.out.println("No games exist, lets default to one!!");
-            id = new Integer(100);
+            id = 100;
         }
         return id;
+    }
+
+    class PieceRowMapper implements RowMapper<Piece> {
+
+        public Piece mapRow(ResultSet resultSet, int i) throws SQLException {
+            Piece piece = new Piece();
+            piece.setColor(resultSet.getString("color"));
+            piece.setType(resultSet.getString("type"));
+            piece.setPieceName(resultSet.getString("pieceId"));
+            return piece;
+        }
     }
 }
