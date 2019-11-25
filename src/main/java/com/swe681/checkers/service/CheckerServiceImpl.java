@@ -141,4 +141,28 @@ public class CheckerServiceImpl implements CheckerService{
     //GameId - Color - Piece Id - MoveFrom - MoveTo
 
 
+    //Determine Legal move for a Piece (Pawn or a King)
+
+    /**
+     * 1. Fetch current row and col for the Piece
+     * 2. Calculate 4 possible row and diagonals for the Piece
+     * 3. If piece is Pawn, eliminate 2 of the diagonals
+     */
+
+    private void calculateDiagonal(int row, int col, String color, String type) {
+        // Diagonal 1
+        String diag1 = (row + 1) + "-" + (col + 1);
+        // Diagonal 2
+        if (color.equalsIgnoreCase("Black") && type.equalsIgnoreCase("Pawn")) {
+
+        }
+        String diag2 = (row + 1) + "-" + (col - 1);
+        //Diagonal 3
+        String diag3 = (row - 1) + "-" + (col + 1);
+        //Diagonal 4
+        String diag4 = (row - 1) + "-" + (col - 1);
+
+    }
+
+
 }
