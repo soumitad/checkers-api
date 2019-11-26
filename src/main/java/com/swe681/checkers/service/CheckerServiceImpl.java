@@ -66,22 +66,42 @@ public class CheckerServiceImpl implements CheckerService{
     public boolean performMove(GamePlayRequest gamePlayRequest) {
         //Update in DB with the new move
         //Call isWinner to check if game can end
-        return false;
+
+        //Step1: Get list of all existing pieces of opposite color
+        //Step2: If no piece exists, current color is the winner
+        //Step3: If pieces exist, for each piece call calculateDiagonal(), If even 1 move exist, break out
+        return isWinner(gamePlayRequest);
     }
 
 
 
     /**
      * Method which is called after every move for a particular color to check, if its a winner
-     * @param color
+     * @param gamePlayRequest
      * @return
      */
-    private boolean isWinner(String color) {
+    private boolean isWinner(GamePlayRequest gamePlayRequest) {
         //Fetch list of remaining color pieces and their current position
         //For each piece, call legalMoves to check if one exists,
         //If even one legal move exists, the color is not winner, use break statement
-
-        return false;
+        List<Piece> pieceList = gameDao.getAllPiecesByColor(gamePlayRequest.getGameId(), gamePlayRequest.getColor());
+        if(pieceList == null) {
+            return true;
+        } else {
+            for (Piece piece: pieceList) {
+                List<String> movesList = calculateDiagonal(gamePlayRequest,
+                        Integer.parseInt(piece.getRowNum()),
+                        Integer.parseInt(piece.getColNum()),
+                        gamePlayRequest.getColor(),
+                        piece.getType());
+                if (movesList.size() > 0) {
+                    return false;
+                } else {
+                    continue;
+                }
+            }
+        }
+        return true;
     }
 
     //Audit trail of the Checkers Game

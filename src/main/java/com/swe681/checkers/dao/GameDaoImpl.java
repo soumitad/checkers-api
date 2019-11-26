@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import static java.time.LocalTime.now;
 
@@ -49,7 +50,7 @@ public class GameDaoImpl implements GameDao{
 
     @Override
     public Piece fetchPieceByPosition(GamePlayRequest gamePlayRequest, int row, int col) {
-        String sql = "select color, pieceId, type from sdas22.gameplay where rowNum=? and colNum=? and gameId=?";
+        String sql = "select color, pieceId, type, rowNum, colNum from sdas22.gameplay where rowNum=? and colNum=? and gameId=?";
         Piece piece;
         try{
             piece = jdbcTemplate.queryForObject(sql,
@@ -58,6 +59,19 @@ public class GameDaoImpl implements GameDao{
             piece = null;
         }
         return piece;
+    }
+
+    @Override
+    public List<Piece> getAllPiecesByColor(String gameId, String color) {
+        String sql = "select color, pieceId, type, rowNum, colNum from sdas22.gameplay where gameId=? and color=?";
+        List<Piece> pieceList;
+        try{
+            pieceList = jdbcTemplate.query(sql,
+                    new PieceRowMapper(), gameId, color);
+        } catch (EmptyResultDataAccessException emptyException) {
+            pieceList = null;
+        }
+        return pieceList;
     }
 
     private Integer fetchLastGameId() {
@@ -80,6 +94,8 @@ public class GameDaoImpl implements GameDao{
             piece.setColor(resultSet.getString("color"));
             piece.setType(resultSet.getString("type"));
             piece.setPieceName(resultSet.getString("pieceId"));
+            piece.setRowNum(resultSet.getString("rowNum"));
+            piece.setColNum(resultSet.getString("colNum"));
             return piece;
         }
     }

@@ -4,6 +4,25 @@ public class Piece {
     private String pieceName;
     private String color;
     private String type;
+    private String rowNum;
+    private String colNum;
+
+    public String getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(String rowNum) {
+        this.rowNum = rowNum;
+    }
+
+    public String getColNum() {
+        return colNum;
+    }
+
+    public void setColNum(String colNum) {
+        this.colNum = colNum;
+    }
+
 
     public String getType() {
         return type;
