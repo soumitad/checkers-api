@@ -38,73 +38,20 @@ public class CheckerServiceImpl implements CheckerService{
 
     @Override
     public List<String> fetchLegalMoves(GamePlayRequest gamePlayRequest) {
-        List<String> allowedLegalMove = new ArrayList<>();
-        Map<Integer, Integer> allowedRowMovement;
-        Map<Integer, List<Integer>> allowedColMovement = util.allowedColMovementForPieces();
-        int row = 0;
-        String[] positionArray = gamePlayRequest.getCurrentPosition().split("-");
-        int legalMovesCounter = 0;
-        if (gamePlayRequest.getColor().equalsIgnoreCase("Red")) {
-            allowedRowMovement = util.getRowMovementForRedPawn();
-            row = allowedRowMovement.get(positionArray[0]);
-            List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
-            //Iterate the Column list and combine with row to check if any piece exists
-            for (Integer col: allowedColsList) {
-                //Check if row - col combo already has a piece and the color of piece to
-                Piece piece = gameDao.fetchPieceByPosition(gamePlayRequest, row, col);
-                if (piece == null) {
-                    allowedLegalMove.add(row + "-" + col) ;
-                } else if (piece != null && piece.getColor().equalsIgnoreCase("Black")) {
-                    if (col == Integer.parseInt(positionArray[1]) + 1 && (col + 1) <= 7) {
-                        if(isJumpPossible(gamePlayRequest, row + 1, col + 1)) {
-                            //Add the row - col combo to the legal moves array
-                            allowedLegalMove.add((row + 1) + "-" + (col + 1));
-                        }
-                    } else if (col == Integer.parseInt(positionArray[1]) - 1 && (col - 1) >= 0) {
-                        if(isJumpPossible(gamePlayRequest, row + 1, col - 1)) {
-                            //Add the row - col combo to the legal moves array
-                            allowedLegalMove.add((row + 1) + "-" + (col -1 ));
-                        }
-                    }
-                }
-            }
-
-        } else {
-            //Fetch legal moves for Black piece
-            allowedRowMovement = util.getRowMovementForBlackPawn();
-            row = allowedRowMovement.get(positionArray[0]);
-            List<Integer> allowedColsList = allowedColMovement.get(positionArray[1]);
-            //Iterate the Column list and combine with row to check if any piece exists
-            for (Integer col: allowedColsList) {
-                //Check if row - col combo already has a piece and the color of piece to
-                Piece piece = gameDao.fetchPieceByPosition(gamePlayRequest, row, col);
-                if (piece == null) {
-                    allowedLegalMove.add(row + "-" + col) ;
-                } else if (piece != null && piece.getColor().equalsIgnoreCase("Red")) {
-                    if (col == Integer.parseInt(positionArray[1]) + 1 && (col + 1) <= 7) {
-                        if(isJumpPossible(gamePlayRequest, row -1 , col + 1)) {
-                            //Add the row - col combo to the legal moves array
-                            allowedLegalMove.add((row - 1) + "-" + (col + 1));
-                        }
-                    } else if (col == Integer.parseInt(positionArray[1]) - 1 && (col - 1) >= 0) {
-                        if(isJumpPossible(gamePlayRequest, row + 1, col - 1)) {
-                            //Add the row - col combo to the legal moves array
-                            allowedLegalMove.add((row - 1) + "-" + (col -1 ));
-                        }
-                    }
-                }
-            }
-        }
+        String[] moveArray = gamePlayRequest.getCurrentPosition().split("-");
+        List<String> allowedLegalMove = calculateDiagonal(gamePlayRequest,
+                Integer.parseInt(moveArray[0]), Integer.parseInt(moveArray[1]),
+                gamePlayRequest.getColor(), gamePlayRequest.getType());
 
         return allowedLegalMove;
     }
 
-    private void fetchAdditionalLegalMoveKing(GamePlayRequest gamePlayRequest) {
-
-    }
 
     private boolean isJumpPossible(GamePlayRequest gamePlayRequest, int row, int col) {
         // Need to determine if Jump is possible
+        if (col < 0 || col > 7 || row < 0 || row > 7) {
+            return false;
+        }
         Piece blockerPiece = gameDao.fetchPieceByPosition(gamePlayRequest, row + 1, col + 1);
         if (blockerPiece == null) {
                 // jump possible
@@ -149,20 +96,115 @@ public class CheckerServiceImpl implements CheckerService{
      * 3. If piece is Pawn, eliminate 2 of the diagonals
      */
 
-    private void calculateDiagonal(int row, int col, String color, String type) {
-        // Diagonal 1
-        String diag1 = (row + 1) + "-" + (col + 1);
+    private List<String> calculateDiagonal(GamePlayRequest gamePlayRequest, int row, int col, String color, String type) {
+        List<String> possibleMovesList = new ArrayList<>();
+        List<String> allowedMovesList = new ArrayList<>();
+
         // Diagonal 2
-        if (color.equalsIgnoreCase("Black") && type.equalsIgnoreCase("Pawn")) {
+        if (color.equalsIgnoreCase("Black")) {
+            if ((row > 0 && row < 7) && (col < 7)) {
+                possibleMovesList.add((row - 1) + "-" + (col + 1));
+            }
+            if ((row > 0 && row < 7) && (col > 0)) {
+                possibleMovesList.add((row - 1) + "-" + (col - 1));
+            }
 
+            if (type.equalsIgnoreCase("King")) {
+                if ((row < 7) && (col < 7)) {
+                    possibleMovesList.add((row + 1) + "-" + (col + 1));
+                }
+                if ((row < 7) && (col > 0)) {
+                    possibleMovesList.add((row + 1) + "-" + (col - 1));
+                }
+            }
+
+        } else {
+            if ((row > 0 && row < 7) && (col < 7)) {
+                possibleMovesList.add((row + 1) + "-" + (col + 1));
+            }
+            if ((row > 0 && row < 7) && (col > 0)) {
+                possibleMovesList.add((row + 1) + "-" + (col - 1));
+            }
+
+            if (type.equalsIgnoreCase("King")) {
+                if ((row > 0) && (col < 7)) {
+                    possibleMovesList.add((row - 1) + "-" + (col + 1));
+                }
+                if ((row > 0) && (col > 0)) {
+                    possibleMovesList.add((row - 1) + "-" + (col - 1));
+                }
+            }
         }
-        String diag2 = (row + 1) + "-" + (col - 1);
-        //Diagonal 3
-        String diag3 = (row - 1) + "-" + (col + 1);
-        //Diagonal 4
-        String diag4 = (row - 1) + "-" + (col - 1);
 
+        for (String move: possibleMovesList) {
+            String[] moveArray = move.split("-");
+            Piece piece = gameDao.fetchPieceByPosition(gamePlayRequest,
+                    Integer.parseInt(moveArray[0]), Integer.parseInt(moveArray[1]));
+            if (piece == null) {
+                allowedMovesList.add(move);
+            } else if (color.equalsIgnoreCase("Black")
+                    && piece.getColor().equalsIgnoreCase("Red")) {
+                if (Integer.parseInt(moveArray[0]) < row) {
+                    if(col < Integer.parseInt(moveArray[1])) {
+                        if(isJumpPossible(gamePlayRequest,
+                                Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) + 1)) {
+                            allowedMovesList.add(move);
+                        }
+                    } else {
+                        if(isJumpPossible(gamePlayRequest,
+                                Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) -1)) {
+                            allowedMovesList.add(move);
+                        }
+                    }
+                } else {
+                    if (type.equalsIgnoreCase("King")) {
+                        if(col < Integer.parseInt(moveArray[1])) {
+                            if(isJumpPossible(gamePlayRequest,
+                                    Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) + 1)) {
+                                allowedMovesList.add(move);
+                            }
+                        } else {
+                            if(isJumpPossible(gamePlayRequest,
+                                    Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) -1)) {
+                                allowedMovesList.add(move);
+                            }
+                        }
+                    }
+                }
+            } else if (color.equalsIgnoreCase("Red")
+                    && piece.getColor().equalsIgnoreCase("Black")) {
+
+                if (Integer.parseInt(moveArray[0]) > row) {
+                    if(col < Integer.parseInt(moveArray[1])) {
+                        if(isJumpPossible(gamePlayRequest,
+                                Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) + 1)) {
+                            allowedMovesList.add(move);
+                        }
+                    } else {
+                        if(isJumpPossible(gamePlayRequest,
+                                Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) - 1)) {
+                            allowedMovesList.add(move);
+                        }
+                    }
+                } else {
+                    if (type.equalsIgnoreCase("King")) {
+                        if(col < Integer.parseInt(moveArray[1])) {
+                            if(isJumpPossible(gamePlayRequest,
+                                    Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) + 1)) {
+                                allowedMovesList.add(move);
+                            }
+                        } else {
+                            if(isJumpPossible(gamePlayRequest,
+                                    Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) - 1)) {
+                                allowedMovesList.add(move);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return allowedMovesList;
     }
-
 
 }

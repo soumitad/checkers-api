@@ -8,6 +8,14 @@ public class GamePlayRequest {
     private String currentPosition;
     private String movePosition;
 
+    public GamePlayRequest(String gameId, String color, String type, String pieceId, String currentPosition) {
+        this.gameId = gameId;
+        this.color = color;
+        this.type = type;
+        this.pieceId = pieceId;
+        this.currentPosition = currentPosition;
+    }
+
     public String getGameId() {
         return gameId;
     }
