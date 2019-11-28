@@ -74,6 +74,12 @@ public class GameDaoImpl implements GameDao{
         return pieceList;
     }
 
+    @Override
+    public int updateGameAuditTrail(String gameId, String color,
+                                    String playerId, String moveFrom, String moveTo) {
+        return 0;
+    }
+
     private Integer fetchLastGameId() {
         Integer id;
         String sql = "select gameId from sdas22.game order by gameId desc limit 1";
