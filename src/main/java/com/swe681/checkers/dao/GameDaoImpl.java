@@ -77,6 +77,13 @@ public class GameDaoImpl implements GameDao{
     @Override
     public int updateGameAuditTrail(String gameId, String color,
                                     String playerId, String moveFrom, String moveTo) {
+
+        return 0;
+    }
+
+    @Override
+    public int performMove(GamePlayRequest gamePlayRequest, boolean isJump) {
+        String moveSql = "Update sdas22.gameplay set rowNum=?, colNum=? where gameId=? and pieceId=?";
         return 0;
     }
 

@@ -14,4 +14,5 @@ public interface GameDao {
     public Piece fetchPieceByPosition(GamePlayRequest gamePlayRequest, int row, int col);
     public List<Piece> getAllPiecesByColor(String gameId, String color);
     public int updateGameAuditTrail(String gameId, String color, String playerId, String moveFrom, String moveTo);
+    public int performMove(GamePlayRequest gamePlayRequest, boolean isJump);
 }

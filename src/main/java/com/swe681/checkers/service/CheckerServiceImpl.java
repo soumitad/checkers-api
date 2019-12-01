@@ -65,6 +65,20 @@ public class CheckerServiceImpl implements CheckerService{
     @Override
     public boolean performMove(GamePlayRequest gamePlayRequest) {
         //Update in DB with the new move
+        String currentPosition = gamePlayRequest.getCurrentPosition();
+        String movePosition = gamePlayRequest.getMovePosition();
+        boolean isCurrentMoveJump = false;
+
+        String[] currentPosArray = new String[2];
+        String[] movePosArray = new String[2];
+        currentPosArray = currentPosition.split("-");
+        movePosArray = movePosition.split("-");
+
+        if (Math.abs(Integer.parseInt(movePosArray[0])
+                - Integer.parseInt(currentPosArray[0])) > 1) {
+            isCurrentMoveJump = true;
+        }
+
         //Call isWinner to check if game can end
 
         //Step1: Get list of all existing pieces of opposite color

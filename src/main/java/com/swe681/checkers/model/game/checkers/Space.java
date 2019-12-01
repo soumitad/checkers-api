@@ -6,8 +6,15 @@ public class Space {
     private int col;
     private boolean playable;
     private Piece piece;
+    private boolean highlight;
 
+    public boolean isHighlight() {
+        return highlight;
+    }
 
+    public void setHighlight(boolean highlight) {
+        this.highlight = highlight;
+    }
     public Piece getPiece() {
         return piece;
     }
