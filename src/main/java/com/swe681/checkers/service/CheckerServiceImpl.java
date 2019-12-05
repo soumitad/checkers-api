@@ -2,9 +2,12 @@ package com.swe681.checkers.service;
 
 import com.swe681.checkers.dao.GameDao;
 import com.swe681.checkers.model.game.checkers.GameInfo;
+import com.swe681.checkers.model.game.checkers.GamePlay;
 import com.swe681.checkers.model.game.checkers.Piece;
+import com.swe681.checkers.model.game.checkers.Space;
 import com.swe681.checkers.model.request.GamePlayRequest;
 import com.swe681.checkers.model.request.GameRequest;
+import com.swe681.checkers.model.response.CheckersMoveResponse;
 import com.swe681.checkers.util.CheckersUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,13 +40,24 @@ public class CheckerServiceImpl implements CheckerService{
     }
 
     @Override
-    public List<String> fetchLegalMoves(GamePlayRequest gamePlayRequest) {
+    public Space[] fetchLegalMoves(GamePlayRequest gamePlayRequest) {
         String[] moveArray = gamePlayRequest.getCurrentPosition().split("-");
         List<String> allowedLegalMove = calculateDiagonal(gamePlayRequest,
                 Integer.parseInt(moveArray[0]), Integer.parseInt(moveArray[1]),
                 gamePlayRequest.getColor(), gamePlayRequest.getType());
 
-        return allowedLegalMove;
+        Space[] allowedSpaces = new Space[allowedLegalMove.size()];
+        int count = 0;
+        for (String legalMove: allowedLegalMove) {
+            Space space = new Space();
+            String[] move = legalMove.split("-");
+            space.setRow(Integer.parseInt(move[0]));
+            space.setCol(Integer.parseInt(move[1]));
+            space.setHighlight(true);
+            allowedSpaces[count++] = space;
+        }
+
+        return allowedSpaces;
     }
 
 
@@ -52,7 +66,7 @@ public class CheckerServiceImpl implements CheckerService{
         if (col < 0 || col > 7 || row < 0 || row > 7) {
             return false;
         }
-        Piece blockerPiece = gameDao.fetchPieceByPosition(gamePlayRequest, row + 1, col + 1);
+        Piece blockerPiece = gameDao.fetchPieceByPosition(gamePlayRequest, row, col);
         if (blockerPiece == null) {
                 // jump possible
             return true;
@@ -63,7 +77,8 @@ public class CheckerServiceImpl implements CheckerService{
     }
 
     @Override
-    public boolean performMove(GamePlayRequest gamePlayRequest) {
+    public CheckersMoveResponse performMove(GamePlayRequest gamePlayRequest) {
+        CheckersMoveResponse response = new CheckersMoveResponse();
         //Update in DB with the new move
         String currentPosition = gamePlayRequest.getCurrentPosition();
         String movePosition = gamePlayRequest.getMovePosition();
@@ -78,16 +93,60 @@ public class CheckerServiceImpl implements CheckerService{
                 - Integer.parseInt(currentPosArray[0])) > 1) {
             isCurrentMoveJump = true;
         }
-
+        int status = gameDao.performMove(gamePlayRequest, isCurrentMoveJump, response);
         //Call isWinner to check if game can end
+        response.setWinner(isWinner(gamePlayRequest));
+        // Call isKing to check if the piece has turned into a King
+        response.setKing(isKing(gamePlayRequest));
 
-        //Step1: Get list of all existing pieces of opposite color
-        //Step2: If no piece exists, current color is the winner
-        //Step3: If pieces exist, for each piece call calculateDiagonal(), If even 1 move exist, break out
-        return isWinner(gamePlayRequest);
+        return response;
     }
 
+    @Override
+    public GameInfo fetchCheckersBoard(String gameId) {
+        GameInfo gameInfo = new GameInfo();
+        Space[][] initialCheckersBoard = util.createEmptySpaces(gameId);
+        List<GamePlay> gamePlayList = gameDao.fetchCheckersBoardPieces(gameId);
+        for (GamePlay gamePlay: gamePlayList) {
+            Piece piece = new Piece();
+            piece.setRowNum(String.valueOf(gamePlay.getRowNum()));
+            piece.setColNum(String.valueOf(gamePlay.getColNum()));
+            piece.setColor(gamePlay.getColor());
+            piece.setType(gamePlay.getType());
+            piece.setPieceName(gamePlay.getPieceId());
+            Space space = initialCheckersBoard[gamePlay.getRowNum()][gamePlay.getColNum()];
+            space.setPiece(piece);
+            initialCheckersBoard[gamePlay.getRowNum()][gamePlay.getColNum()] = space;
+            if (gamePlay.getColor().equalsIgnoreCase("Black")) {
+                gameInfo.setPlayer1(gamePlay.getPlayerId());
+            } else {
+                gameInfo.setPlayer2(gamePlay.getPlayerId());
+            }
+        }
+        gameInfo.setGameBoard(initialCheckersBoard);
+        gameInfo.setGameId(gameId);
+        return gameInfo;
+    }
 
+    /**
+     * Checks to see if the current move has resulted in creation of a King
+     * @param gamePlayRequest
+     * @return
+     */
+    private boolean isKing(GamePlayRequest gamePlayRequest) {
+        String movePosition = gamePlayRequest.getMovePosition();
+        String[] movePosArray = movePosition.split("-");
+        if (gamePlayRequest.getColor().equalsIgnoreCase("Red")) {
+            if (Integer.parseInt(movePosArray[0]) == 7) {
+                return true;
+            }
+        } else {
+            if (Integer.parseInt(movePosArray[0]) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Method which is called after every move for a particular color to check, if its a winner
@@ -136,10 +195,10 @@ public class CheckerServiceImpl implements CheckerService{
 
         // Diagonal 2
         if (color.equalsIgnoreCase("Black")) {
-            if ((row > 0 && row < 7) && (col < 7)) {
+            if ((row > 0 && row <= 7) && (col < 7)) {
                 possibleMovesList.add((row - 1) + "-" + (col + 1));
             }
-            if ((row > 0 && row < 7) && (col > 0)) {
+            if ((row > 0 && row <= 7) && (col > 0)) {
                 possibleMovesList.add((row - 1) + "-" + (col - 1));
             }
 

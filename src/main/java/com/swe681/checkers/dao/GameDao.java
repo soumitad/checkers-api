@@ -1,9 +1,11 @@
 package com.swe681.checkers.dao;
 
 import com.swe681.checkers.model.game.checkers.GameInfo;
+import com.swe681.checkers.model.game.checkers.GamePlay;
 import com.swe681.checkers.model.game.checkers.Piece;
 import com.swe681.checkers.model.request.GamePlayRequest;
 import com.swe681.checkers.model.request.GameRequest;
+import com.swe681.checkers.model.response.CheckersMoveResponse;
 
 import java.util.List;
 
@@ -14,5 +16,6 @@ public interface GameDao {
     public Piece fetchPieceByPosition(GamePlayRequest gamePlayRequest, int row, int col);
     public List<Piece> getAllPiecesByColor(String gameId, String color);
     public int updateGameAuditTrail(String gameId, String color, String playerId, String moveFrom, String moveTo);
-    public int performMove(GamePlayRequest gamePlayRequest, boolean isJump);
+    public int performMove(GamePlayRequest gamePlayRequest, boolean isJump, CheckersMoveResponse checkersMoveResponse);
+    public List<GamePlay> fetchCheckersBoardPieces(String gameId);
 }

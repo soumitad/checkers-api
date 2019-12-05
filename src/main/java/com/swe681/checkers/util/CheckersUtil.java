@@ -110,6 +110,33 @@ public class CheckersUtil {
         return checkersBoard;
     }
 
+    public Space[][] createEmptySpaces(String gameId) {
+        Space[][] checkersBoard = new Space[8][8];
+        for (int i=0; i < 8; i++) {
+            for (int j=0; j < 8; j++) {
+                Space space = new Space();
+                if (i % 2 == 0) {
+                    if (j % 2 == 0) {
+                        space.setPlayable(false);
+                    } else {
+                        space.setPlayable(true);
+                    }
+                } else {
+                    if (j % 2 == 0) {
+                        space.setPlayable(true);
+                    } else {
+                        space.setPlayable(false);
+                    }
+                }
+
+                space.setRow(i);
+                space.setCol(j);
+                checkersBoard[i][j] = space;
+            }
+        }
+        return checkersBoard;
+    }
+
     public Map<Integer, Integer> getRowMovementForBlackPawn() {
         Map<Integer, Integer> blackPawnMap = new HashMap<>();
         blackPawnMap.put(7, 6);
