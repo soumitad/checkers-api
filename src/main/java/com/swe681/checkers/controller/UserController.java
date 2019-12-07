@@ -22,4 +22,24 @@ public class UserController { //has a dependcy on userService to get UserOjbects
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @RequestMapping(value="", method = RequestMethod.POST)
+    public ResponseEntity<User> login(@RequestBody User user) {
+        User loggedInUser = userService.login(user);
+        if (loggedInUser != null) {
+            return new ResponseEntity<User>(loggedInUser, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @RequestMapping(value="/register", method = RequestMethod.POST)
+    public ResponseEntity<User> register(@RequestBody User user) {
+        User loggedInUser = userService.register(user);
+        if (loggedInUser != null) {
+            return new ResponseEntity<User>(loggedInUser, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
