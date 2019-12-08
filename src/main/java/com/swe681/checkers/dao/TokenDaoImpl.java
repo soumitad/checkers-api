@@ -35,15 +35,19 @@ public class TokenDaoImpl implements TokenDao {
         String sql = "select username, token, ttl " +
                 "from sdas22.tokenStore where username=? " +
                 "order by username desc limit 1";
-        List<Token> token;
+        List<Token> token = null;
         try{
             token =  jdbcTemplate.query(
                     sql, new TokenRowMapper(), username);
         } catch (EmptyResultDataAccessException emptyException) {
             System.out.println("No token exists for the user yet");
-            token = null;
+            return null;
         }
-        return token == null? null : token.get(0);
+       if (token != null && token.size() > 0) {
+           return token.get(0);
+       } else {
+           return null;
+       }
     }
 
     class TokenRowMapper implements RowMapper<Token> {
