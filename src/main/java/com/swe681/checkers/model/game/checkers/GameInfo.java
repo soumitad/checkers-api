@@ -5,6 +5,15 @@ public class GameInfo {
     private String player1;
     private String player2;
     private Space[][] gameBoard;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getGameId() {
         return gameId;

@@ -128,6 +128,11 @@ public class CheckerServiceImpl implements CheckerService{
         return gameInfo;
     }
 
+    @Override
+    public List<GameInfo> fetchExistingUserGames(String username) {
+       return gameDao.fetchExistingUserGames(username);
+    }
+
     /**
      * Checks to see if the current move has resulted in creation of a King
      * @param gamePlayRequest

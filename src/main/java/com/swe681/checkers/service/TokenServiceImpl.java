@@ -1,6 +1,5 @@
 package com.swe681.checkers.service;
 
-import com.sun.tools.javac.comp.Check;
 import com.swe681.checkers.dao.TokenDao;
 import com.swe681.checkers.model.Token;
 import com.swe681.checkers.util.CheckersUtil;

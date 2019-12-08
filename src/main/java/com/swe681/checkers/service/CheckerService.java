@@ -14,4 +14,5 @@ public interface CheckerService {
     public Space[] fetchLegalMoves(GamePlayRequest gamePlayRequest);
     public CheckersMoveResponse performMove(GamePlayRequest gamePlayRequest);
     public GameInfo fetchCheckersBoard(String gameId);
+    public List<GameInfo> fetchExistingUserGames(String username);
 }

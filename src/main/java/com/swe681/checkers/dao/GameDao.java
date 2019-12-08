@@ -18,4 +18,5 @@ public interface GameDao {
     public int updateGameAuditTrail(String gameId, String color, String playerId, String moveFrom, String moveTo);
     public int performMove(GamePlayRequest gamePlayRequest, boolean isJump, CheckersMoveResponse checkersMoveResponse);
     public List<GamePlay> fetchCheckersBoardPieces(String gameId);
+    public List<GameInfo> fetchExistingUserGames(String username);
 }

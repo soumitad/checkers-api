@@ -140,6 +140,34 @@ public class GameDaoImpl implements GameDao{
         return pieceList;
     }
 
+    public List<GameInfo> fetchExistingUserGames(String username) {
+        String sql = "select gameId, player1, player2, status from sdas22.game where player1=?";
+        String sql2 = "select gameId, player1, player2, status from sdas22.game where player2=?";
+
+        List<GameInfo> gameList1;
+        List<GameInfo> gameList2;
+        try{
+            gameList1 = jdbcTemplate.query(sql,
+                    new GameInfoRowMapper(), username);
+        } catch (EmptyResultDataAccessException emptyException) {
+            gameList1 = null;
+        }
+
+        try{
+            gameList2 = jdbcTemplate.query(sql2,
+                    new GameInfoRowMapper(), username);
+        } catch (EmptyResultDataAccessException emptyException) {
+            gameList2 = null;
+        }
+
+        if (gameList1 != null) {
+            gameList1.addAll(gameList2);
+        } else {
+            gameList1 = gameList2;
+        }
+        return gameList1;
+    }
+
     private Integer fetchLastGameId() {
         Integer id;
         String sql = "select gameId from sdas22.game order by gameId desc limit 1";
@@ -163,6 +191,18 @@ public class GameDaoImpl implements GameDao{
             piece.setRowNum(resultSet.getString("rowNum"));
             piece.setColNum(resultSet.getString("colNum"));
             return piece;
+        }
+    }
+
+    class GameInfoRowMapper implements RowMapper<GameInfo> {
+
+        public GameInfo mapRow(ResultSet resultSet, int i) throws SQLException {
+            GameInfo gameInfo = new GameInfo();
+            gameInfo.setPlayer1(resultSet.getString("player1"));
+            gameInfo.setPlayer2(resultSet.getString("player2"));
+            gameInfo.setGameId(resultSet.getString("gameId"));
+            gameInfo.setStatus(resultSet.getString("status"));
+            return gameInfo;
         }
     }
 
