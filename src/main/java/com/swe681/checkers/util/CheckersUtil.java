@@ -7,6 +7,7 @@ import com.swe681.checkers.model.game.checkers.Space;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -198,7 +199,14 @@ public class CheckersUtil {
         return whitePawnMap;
     }
 
-
+    public boolean isTokenValid(long ttl) {
+        Instant instant = Instant.now();
+        if (instant.isBefore(Instant.ofEpochMilli(ttl))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private void setPieceInSpace(Space space, int col, int row, boolean playable, Piece piece) {
         space.setCol(col);
