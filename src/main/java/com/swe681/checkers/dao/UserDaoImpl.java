@@ -15,6 +15,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public String getPassword(String username) {
         String sql = "select password from sdas22.user where username=?";
+        System.out.println(username);
         String storedPass="";
         try{
             storedPass =  jdbcTemplate.queryForObject(

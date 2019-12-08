@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -24,7 +25,7 @@ public class TokenDaoImpl implements TokenDao {
         long seconds = TimeUnit.MINUTES.toSeconds( 30 );
         Instant ttl = instant.plusSeconds( seconds );
         int status = jdbcTemplate.update(
-                "INSERT INTO sdas22.tokenStore VALUES (?, ?, ?)",
+                "INSERT INTO sdas22.tokenStore(username, token, ttl) VALUES (?, ?, ?)",
                 username, token, ttl.toEpochMilli());
         return status;
     }
@@ -32,16 +33,17 @@ public class TokenDaoImpl implements TokenDao {
     @Override
     public Token fetchlastToken(String username) {
         String sql = "select username, token, ttl " +
-                "from sdas22.tokenStore order by username desc limit 1";
-        Token token;
+                "from sdas22.tokenStore where username=? " +
+                "order by username desc limit 1";
+        List<Token> token;
         try{
-            token =  jdbcTemplate.queryForObject(
-                    sql, new Object[]{}, Token.class);
+            token =  jdbcTemplate.query(
+                    sql, new TokenRowMapper(), username);
         } catch (EmptyResultDataAccessException emptyException) {
             System.out.println("No token exists for the user yet");
             token = null;
         }
-        return token;
+        return token == null? null : token.get(0);
     }
 
     class TokenRowMapper implements RowMapper<Token> {

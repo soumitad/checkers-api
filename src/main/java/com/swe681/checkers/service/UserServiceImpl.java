@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
             //User is a valid user, generate a new token
             token = tokenService.generateNewToken(userName);
             user.setToken(token);
+            user.setPassword("");
         } else {
             user = null;
         }

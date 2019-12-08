@@ -16,8 +16,10 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateNewToken(String username) {
         Token token = tokenDao.fetchlastToken(username);
-        if(checkersUtil.isTokenValid(token.getTtl())) {
-            return token.getToken();
+        if (token != null) {
+            if(checkersUtil.isTokenValid(token.getTtl())) {
+                return token.getToken();
+            }
         }
         String generatedString = RandomStringUtils.randomAlphanumeric(30);
         int status = tokenDao.insertToken(username, generatedString);
