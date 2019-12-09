@@ -10,7 +10,15 @@ public class CheckersMoveResponse {
     private boolean moveStatus;
     private boolean doubleJumpPossible;
     private Space doubleJumpSpace;
+    private String nextPlayerTurn;
 
+    public String getNextPlayerTurn() {
+        return nextPlayerTurn;
+    }
+
+    public void setNextPlayerTurn(String nextPlayerTurn) {
+        this.nextPlayerTurn = nextPlayerTurn;
+    }
     public boolean isDoubleJumpPossible() {
         return doubleJumpPossible;
     }

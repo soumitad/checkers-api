@@ -6,7 +6,23 @@ public class GameInfo {
     private String player2;
     private Space[][] gameBoard;
     private String status;
+    private String currentTurn;
+    private long timeSinceLastMove;
 
+    public String getCurrentTurn() {
+        return currentTurn;
+    }
+
+    public void setCurrentTurn(String currentTurn) {
+        this.currentTurn = currentTurn;
+    }
+
+    public long getTimeSinceLastMove() {
+        return timeSinceLastMove;
+    }
+    public void setTimeSinceLastMove(long timeSinceLastMove) {
+        this.timeSinceLastMove = timeSinceLastMove;
+    }
     public String getStatus() {
         return status;
     }

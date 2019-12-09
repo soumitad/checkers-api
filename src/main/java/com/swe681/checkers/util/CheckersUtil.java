@@ -202,6 +202,7 @@ public class CheckersUtil {
     public boolean isTokenValid(long ttl) {
         Instant instant = Instant.now();
         if (instant.isBefore(Instant.ofEpochMilli(ttl))) {
+            System.out.println("Now is before TTL of Token");
             return true;
         } else {
             return false;

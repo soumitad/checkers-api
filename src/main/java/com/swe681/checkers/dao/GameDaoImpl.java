@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 
 import static java.time.LocalTime.now;
@@ -33,9 +34,9 @@ public class GameDaoImpl implements GameDao{
         // "select "
         Integer lastGameplayId = fetchLastGameId();
         int status = jdbcTemplate.update(
-                "INSERT INTO sdas22.game VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO sdas22.game(gameId, player1, player2, status, created, winner, currentTurn, timeSinceLastTurn) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 lastGameplayId + 1, gameRequest.getPlayer1(), gameRequest.getPlayer2(),
-                "InProgress",new java.sql.Timestamp(new java.util.Date().getTime()) , null);
+                "InProgress",new java.sql.Timestamp(new java.util.Date().getTime()) , null, gameRequest.getPlayer1(), 0);
         if (status == 1) {
             return lastGameplayId + 1;
         } else {
@@ -141,8 +142,8 @@ public class GameDaoImpl implements GameDao{
     }
 
     public List<GameInfo> fetchExistingUserGames(String username) {
-        String sql = "select gameId, player1, player2, status from sdas22.game where player1=?";
-        String sql2 = "select gameId, player1, player2, status from sdas22.game where player2=?";
+        String sql = "select gameId, player1, player2, status, currentTurn, timeSinceLastTurn from sdas22.game where player1=?";
+        String sql2 = "select gameId, player1, player2, status, currentTurn, timeSinceLastTurn from sdas22.game where player2=?";
 
         List<GameInfo> gameList1;
         List<GameInfo> gameList2;
@@ -166,6 +167,34 @@ public class GameDaoImpl implements GameDao{
             gameList1 = gameList2;
         }
         return gameList1;
+    }
+
+    @Override
+    public GameInfo fetchGame(String gameId) {
+        String sql = "select gameId, player1, player2, status, winner, currentTurn, timeSinceLastTurn from sdas22.game where gameId=?";
+        List<GameInfo> gameList1;
+        try{
+            gameList1 = jdbcTemplate.query(sql,
+                    new GameInfoRowMapper(), gameId);
+        } catch (EmptyResultDataAccessException emptyException) {
+            gameList1 = null;
+        }
+        if (gameList1 != null && gameList1.size() > 0) {
+            return gameList1.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public int updateCurrentPlayerTurn(String gameId, String playerInfo) {
+        Instant instant = Instant.now();
+        String statusSql = "Update sdas22.game set currentTurn=?, timeSinceLastTurn=? where gameId=?";
+        int status = jdbcTemplate.update(
+                statusSql,
+                playerInfo,
+                instant.toEpochMilli(),
+                gameId);
+        return status;
     }
 
     private Integer fetchLastGameId() {
@@ -202,6 +231,8 @@ public class GameDaoImpl implements GameDao{
             gameInfo.setPlayer2(resultSet.getString("player2"));
             gameInfo.setGameId(resultSet.getString("gameId"));
             gameInfo.setStatus(resultSet.getString("status"));
+            gameInfo.setCurrentTurn(resultSet.getString("currentTurn"));
+            gameInfo.setStatus(resultSet.getString("timeSinceLastTurn"));
             return gameInfo;
         }
     }

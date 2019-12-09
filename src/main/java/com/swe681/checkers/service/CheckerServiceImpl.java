@@ -78,6 +78,7 @@ public class CheckerServiceImpl implements CheckerService{
 
     @Override
     public CheckersMoveResponse performMove(GamePlayRequest gamePlayRequest) {
+        GameInfo gameInfo = gameDao.fetchGame(gamePlayRequest.getGameId());
         CheckersMoveResponse response = new CheckersMoveResponse();
         //Update in DB with the new move
         String currentPosition = gamePlayRequest.getCurrentPosition();
@@ -98,7 +99,16 @@ public class CheckerServiceImpl implements CheckerService{
         response.setWinner(isWinner(gamePlayRequest));
         // Call isKing to check if the piece has turned into a King
         response.setKing(isKing(gamePlayRequest));
-
+        String nextPlayerTurn = "";
+        if (gamePlayRequest.getColor().equalsIgnoreCase("Black")) {
+            nextPlayerTurn = gameInfo.getPlayer2();
+        } else {
+            nextPlayerTurn = gameInfo.getPlayer1();
+        }
+        if (status == 1) {
+            gameDao.updateCurrentPlayerTurn(gamePlayRequest.getGameId(), nextPlayerTurn);
+            response.setNextPlayerTurn(nextPlayerTurn);
+        }
         return response;
     }
 
@@ -125,6 +135,10 @@ public class CheckerServiceImpl implements CheckerService{
         }
         gameInfo.setGameBoard(initialCheckersBoard);
         gameInfo.setGameId(gameId);
+        GameInfo tempGameInfo = gameDao.fetchGame(gameId);
+        gameInfo.setStatus(tempGameInfo.getStatus());
+        gameInfo.setCurrentTurn(tempGameInfo.getCurrentTurn());
+        gameInfo.setTimeSinceLastMove(tempGameInfo.getTimeSinceLastMove());
         return gameInfo;
     }
 

@@ -19,4 +19,6 @@ public interface GameDao {
     public int performMove(GamePlayRequest gamePlayRequest, boolean isJump, CheckersMoveResponse checkersMoveResponse);
     public List<GamePlay> fetchCheckersBoardPieces(String gameId);
     public List<GameInfo> fetchExistingUserGames(String username);
+    public GameInfo fetchGame(String gameId);
+    public int updateCurrentPlayerTurn(String gameId, String playerInfo);
 }
