@@ -21,4 +21,5 @@ public interface GameDao {
     public List<GameInfo> fetchExistingUserGames(String username);
     public GameInfo fetchGame(String gameId);
     public int updateCurrentPlayerTurn(String gameId, String playerInfo);
+    public int updatePieceToKing(GamePlayRequest gamePlayRequest);
 }

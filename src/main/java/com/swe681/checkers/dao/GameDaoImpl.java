@@ -197,6 +197,16 @@ public class GameDaoImpl implements GameDao{
         return status;
     }
 
+    @Override
+    public int updatePieceToKing(GamePlayRequest gamePlayRequest) {
+        String moveSql = "Update sdas22.gameplay set type='King' where gameId=? and pieceId=?";
+        int status = jdbcTemplate.update(
+                moveSql,
+                gamePlayRequest.getGameId(),
+                gamePlayRequest.getPieceId());
+        return status;
+    }
+
     private Integer fetchLastGameId() {
         Integer id;
         String sql = "select gameId from sdas22.game order by gameId desc limit 1";

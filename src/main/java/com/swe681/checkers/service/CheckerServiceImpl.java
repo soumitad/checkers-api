@@ -108,7 +108,9 @@ public class CheckerServiceImpl implements CheckerService{
         if (status == 1) {
             gameDao.updateCurrentPlayerTurn(gamePlayRequest.getGameId(), nextPlayerTurn);
             response.setNextPlayerTurn(nextPlayerTurn);
+            response.setMoveStatus(true);
         }
+        response.setJump(isCurrentMoveJump);
         return response;
     }
 
@@ -157,10 +159,12 @@ public class CheckerServiceImpl implements CheckerService{
         String[] movePosArray = movePosition.split("-");
         if (gamePlayRequest.getColor().equalsIgnoreCase("Red")) {
             if (Integer.parseInt(movePosArray[0]) == 7) {
+                gameDao.updatePieceToKing(gamePlayRequest);
                 return true;
             }
         } else {
             if (Integer.parseInt(movePosArray[0]) == 0) {
+                gameDao.updatePieceToKing(gamePlayRequest);
                 return true;
             }
         }
@@ -176,7 +180,8 @@ public class CheckerServiceImpl implements CheckerService{
         //Fetch list of remaining color pieces and their current position
         //For each piece, call legalMoves to check if one exists,
         //If even one legal move exists, the color is not winner, use break statement
-        List<Piece> pieceList = gameDao.getAllPiecesByColor(gamePlayRequest.getGameId(), gamePlayRequest.getColor());
+        List<Piece> pieceList = gameDao.getAllPiecesByColor(gamePlayRequest.getGameId(),
+                gamePlayRequest.getColor().equalsIgnoreCase("Red") ? "Black" : "Red");
         if(pieceList == null) {
             return true;
         } else {
@@ -231,10 +236,10 @@ public class CheckerServiceImpl implements CheckerService{
             }
 
         } else {
-            if ((row > 0 && row < 7) && (col < 7)) {
+            if ((row >= 0 && row < 7) && (col < 7)) {
                 possibleMovesList.add((row + 1) + "-" + (col + 1));
             }
-            if ((row > 0 && row < 7) && (col > 0)) {
+            if ((row >= 0 && row < 7) && (col > 0)) {
                 possibleMovesList.add((row + 1) + "-" + (col - 1));
             }
 
@@ -260,12 +265,12 @@ public class CheckerServiceImpl implements CheckerService{
                     if(col < Integer.parseInt(moveArray[1])) {
                         if(isJumpPossible(gamePlayRequest,
                                 Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) + 1)) {
-                            allowedMovesList.add(move);
+                            allowedMovesList.add(Integer.parseInt(moveArray[0]) - 1 + "-"+ (Integer.parseInt(moveArray[1]) + 1));
                         }
                     } else {
                         if(isJumpPossible(gamePlayRequest,
                                 Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) -1)) {
-                            allowedMovesList.add(move);
+                            allowedMovesList.add(Integer.parseInt(moveArray[0]) - 1 + "-"+ (Integer.parseInt(moveArray[1]) -1));
                         }
                     }
                 } else {
@@ -273,12 +278,12 @@ public class CheckerServiceImpl implements CheckerService{
                         if(col < Integer.parseInt(moveArray[1])) {
                             if(isJumpPossible(gamePlayRequest,
                                     Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) + 1)) {
-                                allowedMovesList.add(move);
+                                allowedMovesList.add(Integer.parseInt(moveArray[0]) + 1 + "-" + (Integer.parseInt(moveArray[1]) + 1));
                             }
                         } else {
                             if(isJumpPossible(gamePlayRequest,
                                     Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) -1)) {
-                                allowedMovesList.add(move);
+                                allowedMovesList.add(Integer.parseInt(moveArray[0]) + 1 + "-" + (Integer.parseInt(moveArray[1]) -1));
                             }
                         }
                     }
@@ -290,12 +295,12 @@ public class CheckerServiceImpl implements CheckerService{
                     if(col < Integer.parseInt(moveArray[1])) {
                         if(isJumpPossible(gamePlayRequest,
                                 Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) + 1)) {
-                            allowedMovesList.add(move);
+                            allowedMovesList.add(Integer.parseInt(moveArray[0]) + 1 + "-" + (Integer.parseInt(moveArray[1]) + 1));
                         }
                     } else {
                         if(isJumpPossible(gamePlayRequest,
                                 Integer.parseInt(moveArray[0]) + 1, Integer.parseInt(moveArray[1]) - 1)) {
-                            allowedMovesList.add(move);
+                            allowedMovesList.add(Integer.parseInt(moveArray[0]) + 1 + "-" + (Integer.parseInt(moveArray[1]) - 1));
                         }
                     }
                 } else {
@@ -303,12 +308,12 @@ public class CheckerServiceImpl implements CheckerService{
                         if(col < Integer.parseInt(moveArray[1])) {
                             if(isJumpPossible(gamePlayRequest,
                                     Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) + 1)) {
-                                allowedMovesList.add(move);
+                                allowedMovesList.add(Integer.parseInt(moveArray[0]) - 1 + "-" + (Integer.parseInt(moveArray[1]) + 1));
                             }
                         } else {
                             if(isJumpPossible(gamePlayRequest,
                                     Integer.parseInt(moveArray[0]) - 1, Integer.parseInt(moveArray[1]) - 1)) {
-                                allowedMovesList.add(move);
+                                allowedMovesList.add(Integer.parseInt(moveArray[0]) - 1 + "-" + (Integer.parseInt(moveArray[1]) - 1));
                             }
                         }
                     }
